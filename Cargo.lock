@@ -113,6 +113,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "futures-sink"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3466821b4bc114d95b087b850a724c6f83115e929bc88f1fa98a3304a944c8a6"
+
+[[package]]
 name = "futures-task"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -223,6 +229,68 @@ dependencies = [
  "muldiv",
  "num-rational",
  "paste",
+]
+
+[[package]]
+name = "gstreamer-app"
+version = "0.15.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dcd64bcbf02233c234b6fde3b582e5b2d0ee37186819d8a08eaefe3436e54f9e"
+dependencies = [
+ "bitflags",
+ "futures-core",
+ "futures-sink",
+ "glib",
+ "glib-sys",
+ "gobject-sys",
+ "gstreamer",
+ "gstreamer-app-sys",
+ "gstreamer-base",
+ "gstreamer-sys",
+ "lazy_static",
+ "libc",
+]
+
+[[package]]
+name = "gstreamer-app-sys"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf869ce152c23bca5d761ab62146b47f750d0b28d4d499731857532897d48167"
+dependencies = [
+ "glib-sys",
+ "gstreamer-base-sys",
+ "gstreamer-sys",
+ "libc",
+ "pkg-config",
+]
+
+[[package]]
+name = "gstreamer-base"
+version = "0.15.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42552f75cc6c260b0be180d5c955f4cd74bd170289c622404c25f1210b521c12"
+dependencies = [
+ "bitflags",
+ "glib",
+ "glib-sys",
+ "gobject-sys",
+ "gstreamer",
+ "gstreamer-base-sys",
+ "gstreamer-sys",
+ "libc",
+]
+
+[[package]]
+name = "gstreamer-base-sys"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba384f52174b3c586593fca32642680a9e67961fea9f4cd8419f678965023bed"
+dependencies = [
+ "glib-sys",
+ "gobject-sys",
+ "gstreamer-sys",
+ "libc",
+ "pkg-config",
 ]
 
 [[package]]
@@ -395,6 +463,7 @@ dependencies = [
  "failure",
  "glib",
  "gstreamer",
+ "gstreamer-app",
  "gstreamer-rtsp-server",
 ]
 
