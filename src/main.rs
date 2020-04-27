@@ -10,6 +10,30 @@ use image::{ImageFormat, GenericImageView};
 
 use std::io::prelude::*;
 
+fn get_iamge_format(fmt: &str) -> ImageFormat {
+    match fmt {
+        "BMP" => ImageFormat::BMP,
+        "JPEG" => ImageFormat::JPEG,
+        "PNG" => ImageFormat::PNG,
+        _ => { panic!("nope"); }
+    }
+}
+fn get_encoder(fmt: &ImageFormat) -> String {
+    match fmt {
+        ImageFormat::BMP => "avenc_bmp".to_string(),
+        ImageFormat::JPEG => "jpegenc".to_string(),
+        ImageFormat::PNG => "pngenc".to_string(),
+        _ => { panic!("nope"); }
+    }
+}
+fn get_extension(fmt: &ImageFormat) -> String {
+    match fmt {
+        ImageFormat::BMP => "bmp".to_string(),
+        ImageFormat::JPEG => "jpg".to_string(),
+        ImageFormat::PNG => "png".to_string(),
+        _ => { panic!("nope"); }
+    }
+}
 
 fn create_pipeline(
     rtsp_url: &String,
@@ -20,9 +44,11 @@ fn create_pipeline(
 
     let file_number = std::sync::Arc::new(std::sync::Mutex::new(0));
 
+    let image_type: ImageFormat = get_iamge_format("PNG");
+
     let source = gst::ElementFactory::make("playbin", None)?;
     let pipeline = source.dynamic_cast::<gst::Pipeline>().unwrap();
-    let pnmenc = gst::ElementFactory::make("pngenc", None)?;
+    let pnmenc = gst::ElementFactory::make(&get_encoder(&image_type), None)?;
     let sink = gst::ElementFactory::make("appsink", None)?;
     let appsink = sink.clone()
         .downcast::<gst_app::AppSink>()
@@ -54,18 +80,19 @@ fn create_pipeline(
     
                             let buffer = sample.get_buffer().unwrap();
                             let map = buffer.map_readable().unwrap();
-                            let png = image::load_from_memory_with_format(&map, ImageFormat::PNG).unwrap();
 
-                            let filename = format!("/tmp/foo-{}.png", current_file_number);
-                            png.save(&filename).unwrap();
-                            println!("wrote to {}", &filename);
-                            
-                            let filename2 = format!("/tmp/foo-{}-buffered.png", current_file_number);
-                            let mut buffer = Vec::new();
-                            png.write_to(&mut buffer, ImageFormat::PNG);
-                            let mut buffered_file = std::fs::File::create(&filename2).unwrap();
-                            buffered_file.write_all(&buffer);
-                            println!("wrote to {}", &filename2);
+                            {
+                                let data = Vec::from(map.as_slice());
+                                let filename = format!("/tmp/foo-{}.{}", current_file_number, &get_extension(&image_type));
+                                let mut buffered_file = std::fs::File::create(&filename).unwrap();
+                                buffered_file.write_all(&data);
+                            }
+                            {
+                                let dynamic_image = image::load_from_memory_with_format(&map, image_type).unwrap();
+                                let filename = format!("/tmp/foo-{}-lib.{}", current_file_number, &get_extension(&image_type));
+                                dynamic_image.save(&filename).unwrap();
+                                println!("wrote to {}", &filename);
+                            }
     
                         } else {
                             frame_sender.send(());
